@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Vector para el fondo ondulado inferior, reemplazo de back_bottom.png -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="50dp"
+    android:viewportWidth="24"
+    android:viewportHeight="6">
+
+    <!-- Capa de fondo sólida -->
+    <path
+        android:fillColor="@color/background"
+        android:pathData="M0,0h24v6H0z" />
+
+    <!-- Primera onda (más clara) -->
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M0,4c2,-2 4,0 6,-1s4,2 6,0 4,-2 6,1 4,0 6,-1V6H0z" />
+
+    <!-- Segunda onda (más oscura) -->
+    <path
+        android:fillColor="@color/primary_variant"
+        android:pathData="M0,5c2,-1 4,0 6,-1s4,1 6,0 4,-1 6,1 4,0 6,-1V6H0z" />
+</vector>

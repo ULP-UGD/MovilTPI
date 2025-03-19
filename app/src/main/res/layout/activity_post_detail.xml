@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".features.users.PerfilFragment">
+
+    <!-- Encabezado colapsable con imagen de perfil -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:background="@drawable/headerbkg"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <!-- Contenedor para la imagen de perfil -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <!-- Imagen circular del usuario -->
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/circleImageView"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:layout_marginBottom="20dp"
+                    android:src="@drawable/ic_person"
+                    app:civ_border_color="@color/on_primary"
+                    app:civ_border_width="5dp"
+                    app:civ_circle_background_color="@color/gray_dark" />
+            </FrameLayout>
+
+            <!-- Detalles del usuario a la derecha -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|right"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="5dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:ignore="RtlHardcoded">
+
+                <!-- Nombre del usuario -->
+                <TextView
+                    android:id="@+id/nameUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/redsocial"
+                    android:textColor="@color/on_primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <!-- Correo del usuario -->
+                <TextView
+                    android:id="@+id/emailUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/redsocial"
+                    android:textColor="@color/on_primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    tools:ignore="TextSizeCheck" />
+
+                <!-- Instagram del usuario -->
+                <TextView
+                    android:id="@+id/insta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/redsocial"
+                    android:textColor="@color/on_primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    tools:ignore="TextSizeCheck" />
+            </LinearLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Contenido desplazable principal -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/default_padding"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- Contenedor vertical para los detalles del post -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Contenedor para el carrusel de imágenes y botón de comentario -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="320dp"
+                android:orientation="vertical">
+
+                <!-- Carrusel de imágenes -->
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/viewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:overScrollMode="never"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="5dp" />
+
+                <!-- Indicadores del carrusel -->
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    app:tabIndicatorColor="@color/primary"
+                    app:tabIndicatorHeight="4dp" />
+
+                <!-- Botón flotante para comentar -->
+                <ImageView
+                    android:id="@+id/fabComentar"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="end|bottom"
+                    android:layout_margin="30dp"
+                    android:padding="7dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_comentario" />
+            </LinearLayout>
+
+            <!-- Lugar del post -->
+            <TextView
+                android:id="@+id/lugar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/gray_dark"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <!-- Categoría del post -->
+            <TextView
+                android:id="@+id/categoria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/on_background"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <!-- Descripción del post -->
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/on_background"
+                android:textSize="14sp" />
+
+            <!-- Duración del viaje -->
+            <TextView
+                android:id="@+id/duracion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/on_background"
+                android:textSize="14sp" />
+
+            <!-- Presupuesto estimado -->
+            <TextView
+                android:id="@+id/presupuesto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/on_background"
+                android:textSize="14sp" />
+
+            <!-- Tarjeta para la lista de comentarios -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <!-- Contenedor vertical para los comentarios -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <!-- Título de la sección de comentarios -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="8dp"
+                        android:text="Comentarios"
+                        android:textColor="@color/on_surface"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <!-- Lista de comentarios -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerComentarios"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Botón para eliminar el post -->
+            <Button
+                android:id="@+id/btnEliminarPost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/primary"
+                android:text="Eliminar Post"
+                android:textColor="@color/on_primary" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

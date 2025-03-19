@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Ítem de navegación para Home -->
+    <item
+        android:id="@+id/itemHome"
+        android:enabled="true"
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
+
+    <!-- Ítem de navegación para Filtros -->
+    <item
+        android:id="@+id/itemFiltros"
+        android:enabled="true"
+        android:icon="@drawable/ic_filter"
+        android:title="Filtros" />
+
+    <!-- Ítem de navegación para Chats -->
+    <item
+        android:id="@+id/itemChats"
+        android:enabled="true"
+        android:icon="@drawable/ic_chat"
+        android:title="Chats" />
+
+    <!-- Ítem de navegación para Perfil -->
+    <item
+        android:id="@+id/itemPerfil"
+        android:enabled="true"
+        android:icon="@drawable/ic_person1"
+        android:title="Perfil" />
+</menu>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Barra superior colapsable con imagen -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="@drawable/headerbkg"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:contentScrim="@color/primary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <!-- Imagen de encabezado -->
+            <ImageView
+                android:id="@+id/uploadImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/uploadimg"
+                app:layout_collapseMode="parallax" />
+
+            <!-- Toolbar fijo -->
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/tools_filtro"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin" />
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Contenedor desplazable para el formulario -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- Tarjeta contenedora del formulario -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <!-- Contenedor vertical para los campos del formulario -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Título del formulario -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/titulo_ppal"
+                    android:textAlignment="center"
+                    android:textColor="@color/primary"
+                    android:textSize="24sp" />
+
+                <!-- Lista de imágenes (oculta por defecto) -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/lavender_border"
+                    android:visibility="gone"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                <!-- Campo de título del post -->
+                <EditText
+                    android:id="@+id/itTitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/lavender_border"
+                    android:hint="@string/titulo_post"
+                    android:padding="16dp"
+                    android:textColor="@color/on_surface"
+                    android:textSize="13sp" />
+
+                <!-- Campo de descripción -->
+                <EditText
+                    android:id="@+id/etDescripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/lavender_border"
+                    android:hint="@string/descripcion"
+                    android:padding="16dp"
+                    android:textColor="@color/on_surface"
+                    android:textSize="13sp" />
+
+                <!-- Selector de categoría -->
+                <Spinner
+                    android:id="@+id/spinnerCategoria"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/lavender_border" />
+
+                <!-- Campo de duración -->
+                <EditText
+                    android:id="@+id/etDuracion"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/lavender_border"
+                    android:gravity="start|center_vertical"
+                    android:hint="@string/duracion"
+                    android:inputType="number"
+                    android:padding="16dp"
+                    android:textColor="@color/on_surface"
+                    android:textSize="13sp" />
+
+                <!-- Campo de presupuesto -->
+                <EditText
+                    android:id="@+id/etPresupuesto"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/lavender_border"
+                    android:gravity="start|center_vertical"
+                    android:hint="@string/presupuesto"
+                    android:inputType="numberDecimal"
+                    android:padding="16dp"
+                    android:textColor="@color/on_surface"
+                    android:textSize="13sp" />
+
+                <!-- Botón para publicar -->
+                <Button
+                    android:id="@+id/btnPublicar"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/primary"
+                    android:text="@string/publicar"
+                    android:textColor="@color/on_primary"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Imagen decorativa inferior -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:scaleType="centerCrop"
+            android:src="@drawable/back_bottom" />
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

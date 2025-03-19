@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">MovilTPI</string>
+    <string name="mis_experiencias">Mis Lugares Preferidos</string>
+    <string name="Chats">Chats</string>
+    <string name="sin_cuenta">No tienes cuenta?</string>
+    <string name="Perfil">Perfil</string>
+    <string name="titulo_perfil">Modifica tus Datos</string>
+    <string name="Filtros">Filtros</string>
+    <string name="publicaciones">PUBLICACIONES</string>
+    <string name="redsocial">Instagram</string>
+    <string name="image_description">Describe tu imagen</string>
+    <string name="titulo_ppal">Realizar un Post</string>
+    <string name="titulo_post">Lugar que Visitaste</string>
+    <string name="lugar">Lugar </string>
+    <string name="Fhome">Publicaciones</string>
+    <string name="comienzaUnChat">Comunicate</string>
+    <string name="registrate">REGISTRATE</string>
+    <string name="nombre_usuario">"Nombre de Usuario"</string>
+    <string name="correo">"Correo electrónico"</string>
+    <string name="pass">"Contraseña"</string>
+    <string name="pass1">"Confirmar Contraseña"</string>
+    <string name="descripcion">Describe tu experiencia...</string>
+    <string name="presupuesto"> Presupuesto estimado (USD)</string>
+    <string name="duracion">Duración del viaje (ej. 3 días) </string>
+    <string name="publicar">Publicar</string>
+    <string name="actualizar">Actualizar Perfil</string>
+    <string name="transtionname_picture">transitionnamepicture</string>
+    <string name="err_pass">La contraseña no puede estar vacía</string>
+    <string name="err_pass1">La contraseña debe tener al menos 6 caracteres</string>
+    <string name="err_pass2">Las contraseñas no coinciden</string>
+    <string name="cargando">Cargando datos...</string>
+    <string-array name="categorias_array">
+        <item>Naturaleza</item>
+        <item>Montaña</item>
+        <item>Aventura</item>
+        <item>Cultura</item>
+        <item>Playa</item>
+        <item>Religión</item>
+    </string-array>
+
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+    <string name="back4app_app_id">bQ9QKFlLd6JrAuQG4zwuway8Y3aL3iKvGkqqr7Nc</string>
+    <string name="back4app_client_key">B5BRGSSXlIfsLu8iIEtsL4QDAVfPPHVJCUGOgFlT</string>
+    <string name="fcm_sender_id">2867001442</string>
+
+    <string-array name="orden_array">
+        <item>Más recientes</item>
+        <item>Más antiguos</item>
+    </string-array>
+</resources>

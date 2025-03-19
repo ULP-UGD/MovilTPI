@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!-- Márgenes y Padding -->
+<dimen name="default_margin">16dp</dimen>
+<dimen name="default_padding">16dp</dimen>
+<dimen name="card_margin">8dp</dimen>
+
+<!-- Tamaños de fuente -->
+<dimen name="text_size_small">12sp</dimen>
+<dimen name="text_size_medium">16sp</dimen>
+<dimen name="text_size_large">20sp</dimen>
+
+<!-- Alturas y Anchuras -->
+<dimen name="image_height">200dp</dimen>
+<dimen name="profile_image_size">55dp</dimen>
+<dimen name="card_width">130dp</dimen>
+
+<!-- Otros -->
+<dimen name="default_elevation">4dp</dimen>
+<dimen name="corner_radius">8dp</dimen>
+</resources>

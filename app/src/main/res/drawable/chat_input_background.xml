@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo para el campo de entrada de texto en el chat -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo sólido que coincide con la superficie -->
+    <solid android:color="@color/surface" />
+    <!-- Bordes redondeados para un diseño suave -->
+    <corners android:radius="24dp" />
+    <!-- Borde sutil para destacar el campo -->
+    <stroke
+        android:width="1dp"
+        android:color="@color/gray_light" />
+</shape>

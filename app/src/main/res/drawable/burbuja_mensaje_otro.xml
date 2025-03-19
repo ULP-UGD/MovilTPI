@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Forma para los mensajes recibidos de otros usuarios -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo sólido para el mensaje recibido -->
+    <solid android:color="@color/gray_light" />
+    <!-- Bordes redondeados -->
+    <corners android:radius="12dp" />
+    <!-- Borde sutil alrededor de la burbuja -->
+    <stroke
+        android:width="1dp"
+        android:color="@color/gray_dark" />
+</shape>

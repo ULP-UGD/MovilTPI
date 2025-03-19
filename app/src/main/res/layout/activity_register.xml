@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".features.auth.RegisterActivity">
+
+    <!-- Contenedor principal vertical para la pantalla de registro -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Vista arqueada superior con fondo primario -->
+        <io.github.florent37.shapeofview.shapes.ArcView
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:elevation="6dp"
+            app:shape_arc_height="30dp"
+            app:shape_arc_position="bottom">
+
+            <!-- Fondo de la vista arqueada -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/primary" />
+
+            <!-- Título de registro -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="@string/registrate"
+                android:textAlignment="center"
+                android:textColor="@color/on_primary"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <!-- Icono de persona -->
+            <ImageView
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="45dp"
+                android:src="@drawable/ic_person" />
+        </io.github.florent37.shapeofview.shapes.ArcView>
+
+        <!-- Campo de entrada para el nombre de usuario -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="35dp"
+            android:layout_marginTop="60dp"
+            android:layout_marginRight="35dp"
+            android:orientation="horizontal">
+
+            <!-- Icono de persona con pin -->
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_person_pin"
+                app:tint="@color/primary" />
+
+            <!-- Campo de texto para nombre de usuario -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxBackgroundMode="none">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/itUsuario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/nombre_usuario"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:textSize="16sp"
+                    android:textColor="@color/on_background" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Campo de entrada para el correo -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="35dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="35dp"
+            android:orientation="horizontal">
+
+            <!-- Icono de correo -->
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_email"
+                app:tint="@color/primary" />
+
+            <!-- Campo de texto para correo -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxBackgroundMode="none">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/itEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/correo"
+                    android:inputType="textEmailAddress"
+                    android:singleLine="true"
+                    android:textSize="16sp"
+                    android:textColor="@color/on_background" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Campo de entrada para la contraseña -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="35dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="35dp"
+            android:orientation="horizontal">
+
+            <!-- Icono de candado -->
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_lock"
+                app:tint="@color/primary" />
+
+            <!-- Campo de texto para contraseña -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxBackgroundMode="none"
+                app:passwordToggleEnabled="true">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/itPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/pass"
+                    android:inputType="textPassword"
+                    android:textSize="16sp"
+                    android:textColor="@color/on_background" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Campo de entrada para confirmar contraseña -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="35dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="35dp"
+            android:orientation="horizontal">
+
+            <!-- Icono de candado -->
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_lock"
+                app:tint="@color/primary" />
+
+            <!-- Campo de texto para confirmar contraseña -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxBackgroundMode="none"
+                app:passwordToggleEnabled="true">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/itPassword1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/pass1"
+                    android:inputType="textPassword"
+                    android:textSize="16sp"
+                    android:textColor="@color/on_background" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Botón de registro -->
+    <Button
+        android:id="@+id/btRegistrar"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="25dp"
+        android:backgroundTint="@color/primary"
+        android:elevation="4dp"
+        android:text="REGISTRATE"
+        android:textColor="@color/on_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:cornerRadius="10dp" />
+
+    <!-- Botón de retroceso -->
+    <ImageView
+        android:id="@+id/circleImageBack"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_margin="18dp"
+        android:background="@drawable/circular_background"
+        android:elevation="4dp"
+        android:padding="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_arrow_left" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

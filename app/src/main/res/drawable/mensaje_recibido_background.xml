@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo para los mensajes recibidos de otros usuarios -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Fondo sólido con un gris claro -->
+    <solid android:color="@color/gray_light" />
+    <!-- Bordes redondeados con ajuste asimétrico -->
+    <corners
+        android:bottomLeftRadius="4dp"
+        android:bottomRightRadius="16dp"
+        android:topLeftRadius="16dp"
+        android:topRightRadius="16dp" />
+</shape>

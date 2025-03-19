@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo para el estado vacío en pantallas sin contenido -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo sólido con un gris claro para el estado vacío -->
+    <solid android:color="@color/gray_light" />
+    <!-- Bordes redondeados para suavizar el diseño -->
+    <corners android:radius="12dp" />
+</shape>

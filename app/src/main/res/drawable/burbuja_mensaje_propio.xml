@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Forma para los mensajes enviados por el usuario -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo sólido con el color primario para mensajes propios -->
+    <solid android:color="@color/primary" />
+    <!-- Bordes redondeados -->
+    <corners android:radius="12dp" />
+</shape>

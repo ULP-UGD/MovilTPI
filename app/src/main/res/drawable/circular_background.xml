@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fondo circular para íconos o botones pequeños -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo sólido que coincide con la superficie -->
+    <solid android:color="@color/surface" />
+    <!-- Radio para hacerlo completamente circular -->
+    <corners android:radius="20dp" />
+</shape>

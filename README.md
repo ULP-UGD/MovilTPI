@@ -74,6 +74,7 @@ MovilTPI es una aplicación móvil Android que permite a los usuarios compartir 
 -   **Perfil**: Accede a tu perfil desde el menú inferior para ver tus publicaciones y datos personales.
 
 ## Estructura del Proyecto
+```
 MovilTPI/
 ├── app/
 │   ├── src/
@@ -91,4 +92,4 @@ MovilTPI/
 │   │   │   ├── res/                   # Recursos (layouts, drawables, valores)
 │   │   │   └── AndroidManifest.xml    # Configuración de la app
 │   └── build.gradle.kts               # Configuración de Gradle
-└── README.md                          # Este archivo
+└── README.md                          # Este archivo```

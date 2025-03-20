@@ -92,4 +92,5 @@ MovilTPI/
 │   │   │   ├── res/                   # Recursos (layouts, drawables, valores)
 │   │   │   └── AndroidManifest.xml    # Configuración de la app
 │   └── build.gradle.kts               # Configuración de Gradle
-└── README.md                          # Este archivo```
+└── README.md                          # Este archivo
+```

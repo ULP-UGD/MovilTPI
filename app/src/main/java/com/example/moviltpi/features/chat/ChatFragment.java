@@ -5,19 +5,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.moviltpi.R;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.example.moviltpi.databinding.FragmentChatBinding;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
@@ -31,110 +25,90 @@ import java.util.Objects;
  */
 public class ChatFragment extends Fragment {
 
-    private ChatViewModel chatViewModel; // ViewModel para gestionar la lógica del chat
-    private MensajeAdapter adapter; // Adaptador para el RecyclerView de mensajes
-    private EditText etMensaje; // Campo de texto para escribir mensajes
+    private FragmentChatBinding binding; // Objeto de binding para acceder a las vistas del layout
+    private ChatViewModel chatViewModel; // ViewModel que gestiona la lógica del chat
+    private MensajeAdapter adapter; // Adaptador para el RecyclerView que muestra los mensajes
     private ParseUser otroUsuario; // Usuario con el que se está chateando
-    private RecyclerView recyclerView; // RecyclerView que muestra los mensajes
-    private FloatingActionButton fabEnviar; // Botón flotante para enviar mensajes
-    private TextView tvNoUserSelected; // Texto que indica que no hay usuario seleccionado
-    private SwipeRefreshLayout swipeRefreshLayout; // Layout para refrescar mensajes
     private boolean isObservingMessages = false; // Bandera para verificar si se están observando mensajes
 
     /**
      * Método llamado cuando se crea la vista del fragmento.
      * Inicializa los componentes de la interfaz de usuario y configura su comportamiento.
      *
-     * @param inflater           Inflater para inflar la vista
-     * @param container          Contenedor de la vista
-     * @param savedInstanceState Estado previo guardado
+     * @param inflater           Inflater para inflar la vista del layout
+     * @param container          Contenedor padre donde se insertará la vista
+     * @param savedInstanceState Estado previo guardado, si existe
      * @return Vista inflada del fragmento
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        // Inflamos la vista usando View Binding
+        binding = FragmentChatBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
 
-        // Configuración de la barra de herramientas
-        Toolbar toolbar = view.findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+        // Configuración de la barra de herramientas (Toolbar)
+        if (binding.toolbar != null) {
+            ((AppCompatActivity) requireActivity()).setSupportActionBar(binding.toolbar);
         }
 
-        // Inicialización de los elementos de la interfaz de usuario
-        recyclerView = view.findViewById(R.id.recyclerMensajes2);
-        etMensaje = view.findViewById(R.id.etMensaje);
-        fabEnviar = view.findViewById(R.id.fabEnviar2);
-        tvNoUserSelected = view.findViewById(R.id.tvNoUserSelected2);
-
-        // Configurar SwipeRefreshLayout si existe en el layout
-        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout2);
-        if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setOnRefreshListener(() -> {
+        // Configurar el SwipeRefreshLayout para actualizar los mensajes manualmente
+        if (binding.swipeRefreshLayout2 != null) {
+            binding.swipeRefreshLayout2.setOnRefreshListener(() -> {
                 if (chatViewModel != null) {
-                    chatViewModel.refreshMessages();
-                    swipeRefreshLayout.setRefreshing(false);
+                    chatViewModel.refreshMessages(); // Refresca los mensajes desde el ViewModel
+                    binding.swipeRefreshLayout2.setRefreshing(false); // Detiene el indicador de refresco
                 }
             });
         }
 
-        // Si el TextView para "Sin usuario seleccionado" no existe, lo creamos dinámicamente
-        if (tvNoUserSelected == null) {
-            tvNoUserSelected = new TextView(getContext());
-            tvNoUserSelected.setText("Selecciona un usuario para chatear");
-            tvNoUserSelected.setTextSize(16);
-            tvNoUserSelected.setPadding(32, 64, 32, 64);
-            tvNoUserSelected.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            ((ViewGroup) recyclerView.getParent()).addView(tvNoUserSelected);
-        }
-
-        // Configuración del RecyclerView
+        // Configuración del RecyclerView para mostrar los mensajes
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        layoutManager.setStackFromEnd(true); // Hace que los mensajes se apilen desde abajo
-        recyclerView.setLayoutManager(layoutManager);
+        layoutManager.setStackFromEnd(true); // Los mensajes se apilan desde el final (abajo)
+        binding.recyclerMensajes2.setLayoutManager(layoutManager);
         adapter = new MensajeAdapter(new ArrayList<>(), ParseUser.getCurrentUser());
-        recyclerView.setAdapter(adapter);
+        binding.recyclerMensajes2.setAdapter(adapter);
 
-        // Inicializar el ViewModel
+        // Inicialización del ViewModel compartido con la actividad
         chatViewModel = new ViewModelProvider(requireActivity()).get(ChatViewModel.class);
 
-        // Obtener el usuario seleccionado
+        // Obtener el usuario con el que se chateará
         otroUsuario = obtenerOtroUsuario();
         if (otroUsuario == null) {
             Log.d("ChatsFragment", "No hay usuario seleccionado");
-            mostrarInterfazSinUsuario();
+            mostrarInterfazSinUsuario(); // Mostrar interfaz sin usuario
             return view;
         }
 
-        // Configuración de la barra de herramientas con el nombre del usuario
-        if (toolbar != null && ((AppCompatActivity) requireActivity()).getSupportActionBar() != null) {
+        // Configurar el título de la barra de herramientas con el nombre del usuario
+        if (binding.toolbar != null && ((AppCompatActivity) requireActivity()).getSupportActionBar() != null) {
             Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar())
                     .setTitle("Chat con " + otroUsuario.getUsername());
         }
 
-        // Mostrar la interfaz de chat
+        // Mostrar la interfaz completa del chat
         mostrarInterfazConUsuario();
 
-        // Observar los mensajes del usuario seleccionado
+        // Iniciar la observación de mensajes en tiempo real
         observarMensajes();
 
-        // Configurar el botón de enviar mensaje
-        fabEnviar.setOnClickListener(v -> enviarMensaje());
+        // Configurar el botón flotante para enviar mensajes
+        binding.fabEnviar2.setOnClickListener(v -> enviarMensaje());
 
         return view;
     }
 
     /**
      * Método llamado cuando el fragmento se reanuda.
-     * Asegura que se estén observando los mensajes y reanuda el polling si es necesario.
+     * Reanuda la observación de mensajes y el polling si es necesario.
      */
     @Override
     public void onResume() {
         super.onResume();
         if (otroUsuario != null && !isObservingMessages) {
-            observarMensajes();
+            observarMensajes(); // Reanudar la observación de mensajes si estaba pausada
         }
         if (chatViewModel != null) {
-            chatViewModel.resumePolling();
+            chatViewModel.resumePolling(); // Reanudar el polling del ViewModel
         }
     }
 
@@ -145,23 +119,34 @@ public class ChatFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        isObservingMessages = false;
+        isObservingMessages = false; // Marcar que no se están observando mensajes
         if (chatViewModel != null) {
-            chatViewModel.pausePolling();
+            chatViewModel.pausePolling(); // Pausar el polling del ViewModel
         }
     }
 
     /**
-     * Observa los mensajes del usuario seleccionado y actualiza el RecyclerView.
+     * Método llamado cuando la vista del fragmento se destruye.
+     * Libera el objeto de binding para evitar memory leaks.
+     */
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null; // Liberar el binding para evitar referencias a vistas destruidas
+    }
+
+    /**
+     * Observa los mensajes del usuario seleccionado y actualiza el RecyclerView en tiempo real.
      */
     private void observarMensajes() {
         if (otroUsuario != null) {
-            isObservingMessages = true;
+            isObservingMessages = true; // Indicar que se están observando mensajes
             chatViewModel.getMensajes(otroUsuario).observe(getViewLifecycleOwner(), mensajes -> {
                 Log.d("ChatsFragment", "Mensajes cargados: " + mensajes.size());
-                adapter.setMensajes(mensajes);
+                adapter.setMensajes(mensajes); // Actualizar el adaptador con los nuevos mensajes
                 if (!mensajes.isEmpty()) {
-                    recyclerView.scrollToPosition(mensajes.size() - 1);
+                    // Desplazar el RecyclerView al último mensaje
+                    binding.recyclerMensajes2.scrollToPosition(mensajes.size() - 1);
                 }
             });
         }
@@ -178,7 +163,7 @@ public class ChatFragment extends Fragment {
             String userId = bundle.getString("otroUsuarioId");
             ParseUser user = ParseUser.createWithoutData(ParseUser.class, userId);
             try {
-                user.fetchIfNeeded(); // Asegura que tenga los datos cargados
+                user.fetchIfNeeded(); // Cargar los datos del usuario desde el servidor
                 Log.d("ChatsFragment", "Usuario cargado: " + user.getUsername());
                 return user;
             } catch (ParseException e) {
@@ -196,49 +181,54 @@ public class ChatFragment extends Fragment {
     public void updateUser(ParseUser newUser) {
         this.otroUsuario = newUser;
 
+        // Actualizar el título de la barra de herramientas
         if (getActivity() != null && ((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Chat con " + otroUsuario.getUsername());
+            ((AppCompatActivity) getActivity()).getSupportActionBar()
+                    .setTitle("Chat con " + otroUsuario.getUsername());
         }
 
         if (otroUsuario == null) {
-            mostrarInterfazSinUsuario();
+            mostrarInterfazSinUsuario(); // Mostrar interfaz sin usuario si no hay selección
             return;
         }
 
-        mostrarInterfazConUsuario();
-        isObservingMessages = false;
-        observarMensajes();
+        mostrarInterfazConUsuario(); // Mostrar interfaz de chat completa
+        isObservingMessages = false; // Reiniciar la bandera
+        observarMensajes(); // Reiniciar la observación de mensajes
     }
 
     /**
      * Envía un mensaje al usuario seleccionado y actualiza la interfaz.
      */
     private void enviarMensaje() {
-        String texto = etMensaje.getText().toString().trim();
+        String texto = binding.etMensaje.getText().toString().trim();
         if (!texto.isEmpty()) {
+            // Enviar el mensaje a través del ViewModel
             chatViewModel.enviarMensaje(texto, ParseUser.getCurrentUser(), otroUsuario);
-            etMensaje.setText("");
-
-            // Desplazar el RecyclerView hacia abajo
-            recyclerView.post(() -> recyclerView.scrollToPosition(adapter.getItemCount() - 1));
+            binding.etMensaje.setText(""); // Limpiar el campo de texto
+            // Desplazar el RecyclerView al último mensaje después de enviarlo
+            binding.recyclerMensajes2.post(() ->
+                    binding.recyclerMensajes2.scrollToPosition(adapter.getItemCount() - 1));
         }
     }
 
     /**
      * Muestra la interfaz cuando no hay usuario seleccionado.
+     * Oculta los elementos de chat y muestra un mensaje informativo.
      */
     private void mostrarInterfazSinUsuario() {
         if (getView() != null) {
-            getView().post(() -> { // Usar post para asegurar que se ejecute en el hilo principal
-                recyclerView.setVisibility(View.GONE);
-                etMensaje.setVisibility(View.GONE);
-                fabEnviar.setVisibility(View.GONE);
-                if (swipeRefreshLayout != null) {
-                    swipeRefreshLayout.setVisibility(View.GONE);
+            getView().post(() -> { // Ejecutar en el hilo principal
+                binding.recyclerMensajes2.setVisibility(View.GONE);
+                binding.etMensaje.setVisibility(View.GONE);
+                binding.fabEnviar2.setVisibility(View.GONE);
+                if (binding.swipeRefreshLayout2 != null) {
+                    binding.swipeRefreshLayout2.setVisibility(View.GONE);
                 }
-                tvNoUserSelected.setVisibility(View.VISIBLE);
+                binding.tvNoUserSelected2.setVisibility(View.VISIBLE);
 
-                if (isAdded()) { // Verificar si el fragmento está agregado antes de intentar popBackStack
+                // Volver atrás en la pila de fragmentos si está agregado
+                if (isAdded()) {
                     requireActivity().getSupportFragmentManager().popBackStack();
                 }
             });
@@ -247,14 +237,15 @@ public class ChatFragment extends Fragment {
 
     /**
      * Muestra la interfaz cuando hay un usuario seleccionado.
+     * Muestra los elementos de chat y oculta el mensaje de "sin usuario".
      */
     private void mostrarInterfazConUsuario() {
-        tvNoUserSelected.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
-        etMensaje.setVisibility(View.VISIBLE);
-        fabEnviar.setVisibility(View.VISIBLE);
-        if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setVisibility(View.VISIBLE);
+        binding.tvNoUserSelected2.setVisibility(View.GONE);
+        binding.recyclerMensajes2.setVisibility(View.VISIBLE);
+        binding.etMensaje.setVisibility(View.VISIBLE);
+        binding.fabEnviar2.setVisibility(View.VISIBLE);
+        if (binding.swipeRefreshLayout2 != null) {
+            binding.swipeRefreshLayout2.setVisibility(View.VISIBLE);
         }
     }
 }

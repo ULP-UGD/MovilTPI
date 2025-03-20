@@ -2,6 +2,14 @@ package com.example.moviltpi.features.posts;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,22 +19,11 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.Toast;
-
 import com.example.moviltpi.R;
 import com.example.moviltpi.core.models.Post;
 import com.example.moviltpi.databinding.FragmentHomeBinding;
 import com.example.moviltpi.features.auth.AuthViewModel;
 import com.example.moviltpi.features.auth.MainActivity;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,16 +33,15 @@ import java.util.List;
  * Permite al usuario crear nuevas publicaciones y cerrar sesión.
  */
 public class HomeFragment extends Fragment {
-    private FragmentHomeBinding binding;
-    private PostViewModel postViewModel;
-    private AuthViewModel authViewModel;
-    private PostAdapter postAdapter;
-    private boolean isFirstLoad = true;
-    private LinearLayout emptyView;
-    private FloatingActionButton fab;
+
+    private FragmentHomeBinding binding; // Objeto de binding para acceder a las vistas
+    private PostViewModel postViewModel; // ViewModel para gestionar las publicaciones
+    private AuthViewModel authViewModel; // ViewModel para la autenticación
+    private PostAdapter postAdapter; // Adaptador para el RecyclerView
+    private boolean isFirstLoad = true; // Bandera para la primera carga
 
     /**
-     * Constructor vacío requerido.
+     * Constructor vacío requerido por el sistema de fragmentos.
      */
     public HomeFragment() {
         // Required empty public constructor
@@ -54,7 +50,7 @@ public class HomeFragment extends Fragment {
     /**
      * Crea una nueva instancia del fragmento HomeFragment.
      *
-     * @return Una nueva instancia de HomeFragment.
+     * @return Una nueva instancia de HomeFragment
      */
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -62,6 +58,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflamos la vista usando View Binding
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -70,58 +67,35 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Inicializar ViewModels
+        // Inicializar ViewModels compartidos con la actividad
         postViewModel = new ViewModelProvider(requireActivity()).get(PostViewModel.class);
         authViewModel = new ViewModelProvider(requireActivity()).get(AuthViewModel.class);
 
-        // Configurar Toolbar
+        // Configurar la Toolbar como ActionBar
         ((AppCompatActivity) requireActivity()).setSupportActionBar(binding.tools);
 
-        // Configurar RecyclerView
+        // Configurar el RecyclerView
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        postAdapter = new PostAdapter(new ArrayList<>()); // Inicializar con lista vacía
+        postAdapter = new PostAdapter(new ArrayList<>());
         binding.recyclerView.setAdapter(postAdapter);
 
-        // Obtener referencia a la vista vacía
-        emptyView = binding.emptyView;
+        // Configurar el FloatingActionButton para crear nuevas publicaciones
+        binding.fab.setOnClickListener(v -> {
+            Log.d("HomeFragment", "FAB clicked");
+            Intent intent = new Intent(getContext(), PostActivity.class);
+            startActivity(intent);
+        });
 
-        // Configurar FAB
-        fab = binding.fab;
-        if (fab != null) {
-            Log.d("HomeFragment", "FAB encontrado y configurado");
-            fab.setVisibility(View.VISIBLE);
-            fab.setOnClickListener(v -> {
-                Log.d("HomeFragment", "FAB clicked");
-                Intent intent = new Intent(getContext(), PostActivity.class);
-                startActivity(intent);
-            });
-        } else {
-            Log.e("HomeFragment", "FAB es null");
-            // Intenta encontrar el FAB directamente desde la vista
-            fab = view.findViewById(R.id.fab);
-            if (fab != null) {
-                Log.d("HomeFragment", "FAB encontrado directamente desde la vista");
-                fab.setVisibility(View.VISIBLE);
-                fab.setOnClickListener(v -> {
-                    Log.d("HomeFragment", "FAB clicked");
-                    Intent intent = new Intent(getContext(), PostActivity.class);
-                    startActivity(intent);
-                });
-            } else {
-                Log.e("HomeFragment", "FAB no encontrado en la vista");
-            }
-        }
-
-        // Solo resetear filtros en la primera carga
+        // Resetear filtros solo en la primera carga
         if (isFirstLoad) {
             postViewModel.resetFilters();
             isFirstLoad = false;
         }
 
-        // Cargar posts
+        // Cargar las publicaciones iniciales
         cargarPosts();
 
-        // Configurar menú
+        // Configurar el menú de la Toolbar
         setupMenu();
     }
 
@@ -129,45 +103,36 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        // Limpiar el adaptador para evitar que se muestren imágenes antiguas
+        // Limpiar el adaptador para evitar datos obsoletos
         if (postAdapter != null) {
             postAdapter.clearPosts();
         }
 
-        // Solo resetear filtros si venimos de otra actividad, no de un fragmento
+        // Resetear filtros solo si no hay fragmentos en la pila (venir de otra actividad)
         if (requireActivity().getSupportFragmentManager().getBackStackEntryCount() == 0) {
             postViewModel.resetFilters();
         }
 
-        // Recargar posts
+        // Recargar publicaciones
         cargarPosts();
 
         // Asegurar que el FAB esté visible
-        if (fab != null) {
-            fab.setVisibility(View.VISIBLE);
-        } else {
-            Log.e("HomeFragment", "FAB es null en onResume");
-            // Intenta encontrar el FAB nuevamente
-            View view = getView();
-            if (view != null) {
-                fab = view.findViewById(R.id.fab);
-                if (fab != null) {
-                    fab.setVisibility(View.VISIBLE);
-                }
-            }
-        }
+        binding.fab.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null; // Liberar el binding para evitar memory leaks
     }
 
     /**
      * Carga las publicaciones desde el ViewModel y observa los cambios.
      */
     private void cargarPosts() {
-        // Mostrar el indicador de progreso
+        // Mostrar el indicador de progreso si la actividad lo soporta
         if (getActivity() instanceof HomeActivity) {
-            View progressBarLayout = getActivity().findViewById(R.id.progress_layout);
-            if (progressBarLayout != null) {
-                progressBarLayout.setVisibility(View.VISIBLE);
-            }
+            ((HomeActivity) requireActivity()).showProgressBar();
         }
 
         postViewModel.getPosts().observe(getViewLifecycleOwner(), this::updateUI);
@@ -176,7 +141,7 @@ public class HomeFragment extends Fragment {
     /**
      * Actualiza la interfaz de usuario con la lista de publicaciones.
      *
-     * @param posts La lista de publicaciones a mostrar.
+     * @param posts Lista de publicaciones a mostrar
      */
     private void updateUI(List<Post> posts) {
         // Ocultar el indicador de progreso
@@ -184,32 +149,31 @@ public class HomeFragment extends Fragment {
             ((HomeActivity) requireActivity()).hideProgressBar();
         }
 
+        // Manejar caso de lista nula
         if (posts == null) {
             posts = new ArrayList<>();
         }
 
         Log.d("HomeFragment", "Número de posts: " + posts.size());
 
-        // Actualizar el adaptador
+        // Actualizar el adaptador con las publicaciones
         postAdapter.setPosts(posts);
 
-        // Mostrar vista vacía si no hay posts y hay filtros activos
+        // Mostrar u ocultar la vista vacía según corresponda
         if (posts.isEmpty() && postViewModel.isFiltered()) {
             binding.recyclerView.setVisibility(View.GONE);
-            emptyView.setVisibility(View.VISIBLE);
+            binding.emptyView.setVisibility(View.VISIBLE);
         } else {
             binding.recyclerView.setVisibility(View.VISIBLE);
-            emptyView.setVisibility(View.GONE);
+            binding.emptyView.setVisibility(View.GONE);
         }
 
         // Asegurar que el FAB esté visible
-        if (fab != null) {
-            fab.setVisibility(View.VISIBLE);
-        }
+        binding.fab.setVisibility(View.VISIBLE);
     }
 
     /**
-     * Configura el menú de la barra de herramientas.
+     * Configura el menú de la Toolbar con las opciones disponibles.
      */
     private void setupMenu() {
         requireActivity().addMenuProvider(new MenuProvider() {
@@ -230,7 +194,7 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * Realiza el cierre de sesión del usuario.
+     * Realiza el cierre de sesión del usuario y redirige a la pantalla de inicio.
      */
     private void onLogout() {
         authViewModel.logout().observe(getViewLifecycleOwner(), logoutResult -> {
@@ -242,11 +206,5 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getContext(), "Error al cerrar sesión. Intenta nuevamente.", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null; // Prevenir fugas de memoria
     }
 }

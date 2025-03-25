@@ -58,6 +58,52 @@ MovilTPI es una aplicación móvil Android que permite a los usuarios compartir 
     <string name="back4app_client_key">TU_CLIENT_KEY</string>
     ```
 
+>[!NOTE]
+> Para que funcione correctamente el chat, debes configurar lo siguiente en Cloud Code en Back4App
+>
+>Debes agregar el siguiente codigo en cloud/main.js y luego hacer clic en Deploy
+>
+> ```js
+> Parse.Cloud.beforeSave('Messages', async (request) => {
+>   const message = request.object;
+>   if (!message.existed()) {
+>     const receiverId = message.get('receiver').id;
+>
+>     const query = new Parse.Query(Parse.Installation);
+>     query.equalTo('user', { __type: 'Pointer', className: '_User', objectId: receiverId });
+>
+>     const payload = {
+>       data: {
+>         alert: `New message from ${message.get('sender').get('username')}`,
+>         title: 'New Message',
+>         messageId: message.id,
+>         senderId: message.get('sender').id
+>       },
+>     };
+>
+>     try {
+>       await Parse.Push.send({
+>         where: query,
+>         data: payload
+>       }, { useMasterKey: true });
+>     } catch (error) {
+>       console.error('Error while sending push notification', error);
+>     }
+>   }
+> });
+>
+> Parse.Cloud.beforeSave(Parse.User, async (request) => {
+>   const user = request.object;
+>
+>   // Crear un ACL público
+>   const acl = new Parse.ACL();
+>   acl.setPublicReadAccess(true); // Permite lectura pública
+>
+>   // Aplicar el ACL al usuario
+>   user.setACL(acl);
+> });
+> ```
+
 4.  **Sincronizar dependencias**:
     -   Haz clic en "Sync Project with Gradle Files" en Android Studio para descargar todas las dependencias.
 

@@ -75,8 +75,13 @@ public class AuthProvider {
                 authResult.setValue(parseUser.getObjectId());
                 Log.d("AuthProvider", "Usuario registrado exitosamente: " + parseUser.getObjectId());
             } else {
-                Log.e("AuthProvider", "Error en registro: ", e);
-                authResult.setValue(null);
+                // Aquí manejamos específicamente el error de email duplicado
+                if (e.getCode() == 202) {
+                    authResult.postValue("EMAIL_DUPLICADO"); // Valor especial para este caso
+                } else {
+                    Log.e("AuthProvider", "Error en registro: ", e);
+                    authResult.setValue(null);
+                }
             }
         });
 

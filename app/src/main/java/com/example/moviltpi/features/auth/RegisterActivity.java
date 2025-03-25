@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.moviltpi.core.models.User;
 import com.example.moviltpi.core.utils.Validaciones;
 import com.example.moviltpi.databinding.ActivityRegisterBinding;
+import com.example.moviltpi.features.posts.HomeActivity;
 
 import java.util.Objects;
 
@@ -28,8 +29,21 @@ public class RegisterActivity extends AppCompatActivity {
         binding = ActivityRegisterBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         viewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
-        // Observa el resultado del registro y muestra un Toast con el mensaje.
-        viewModel.getRegisterResult().observe(this, this::showToast);
+        // Observa el resultado del registro y muestra un Toast con el mensaje o redirige en caso de exito.
+        viewModel.getRegisterResult().observe(this, result -> {
+            if (result != null) {
+                if (result.equals("EMAIL_DUPLICADO")) {
+                    showToast("El correo electrónico ya está registrado");
+                } else {
+                    // Registro exitoso, redirigir al Home
+                    Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                    finish(); // Finalizar esta actividad
+                }
+            } else {
+                showToast("Error durante el registro");
+            }
+        });
         manejarEventos();
     }
 

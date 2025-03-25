@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Colores base -->
-    <color name="primary">#6B7280</color>
-    <color name="primary_variant">#374151</color>
-    <color name="secondary">#10B981</color>
-    <color name="background">#F9FAFB</color>
-    <color name="surface">#FFFFFF</color>
-    <color name="on_primary">#FFFFFF</color>
-    <color name="on_secondary">#000000</color>
-    <color name="on_background">#111827</color>
-    <color name="on_surface">#111827</color>
-    <color name="gray_light">#D1D5DB</color>
-    <color name="gray_dark">#6B7280</color>
+    <color name="primary">#577A66</color> <!-- Verde terroso medio -->
+    <color name="primary_variant">#3D5746</color> <!-- Verde terroso oscuro -->
+    <color name="secondary">#A8B5A2</color> <!-- Verde grisáceo claro -->
+    <color name="background">#F7F7F5</color> <!-- Gris muy claro -->
+    <color name="surface">#FFFFFF</color> <!-- Blanco puro -->
+    <color name="on_primary">#FFFFFF</color> <!-- Blanco sobre primario -->
+    <color name="on_secondary">#2D3A33</color> <!-- Gris verdoso oscuro sobre secundario -->
+    <color name="on_background">#2D3A33</color> <!-- Gris verdoso oscuro para texto -->
+    <color name="on_surface">#2D3A33</color> <!-- Igual que on_background -->
+    <color name="gray_light">#D8DDD9</color> <!-- Gris claro con toque verde -->
+    <color name="gray_dark">#6E8778</color> <!-- Verde grisáceo medio -->
 </resources>

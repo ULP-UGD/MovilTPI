@@ -60,6 +60,7 @@ public class HomeActivity extends AppCompatActivity {
         // Cargar el HomeFragment por defecto si no hay estado guardado
         if (savedInstanceState == null) {
             openFragment(HomeFragment.newInstance(), true, "HOME_FRAGMENT");
+            //binding.bottomNavigation.setSelectedItemId(R.id.itemHome); // Seleccionar el itemHome inicialmente
         }
     }
 

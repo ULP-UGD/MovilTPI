@@ -104,7 +104,7 @@ public class PostViewModel extends ViewModel {
         Log.d("PostViewModel", "Reseteando filtros");
         this.currentCategoria = "Todas";
         this.currentOrden = "Más recientes";
-        // No se recargan los posts aquí, debe llamarse loadPosts() explícitamente si se desea
+
     }
 
     /**

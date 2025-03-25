@@ -282,10 +282,11 @@ public class PostProvider {
         query.include("user");
         query.findInBackground((posts, e) -> {
             if (e == null) {
+                Log.d("PostProvider", "Posts filtrados encontrados: " + (posts != null ? posts.size() : 0));
                 result.setValue(posts != null ? posts : new ArrayList<>());
             } else {
-                result.setValue(new ArrayList<>());
                 Log.e("PostProvider", "Error al recuperar posts filtrados: ", e);
+                result.setValue(new ArrayList<>());
             }
         });
 

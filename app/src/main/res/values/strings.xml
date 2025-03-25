@@ -1,4 +1,9 @@
 <resources>
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+    <string name="back4app_app_id">bQ9QKFlLd6JrAuQG4zwuway8Y3aL3iKvGkqqr7Nc</string>
+    <string name="back4app_client_key">B5BRGSSXlIfsLu8iIEtsL4QDAVfPPHVJCUGOgFlT</string>
+    <string name="fcm_sender_id">2867001442</string>
+
     <string name="app_name">MovilTPI</string>
     <string name="mis_experiencias">Mis Lugares Preferidos</string>
     <string name="Chats">Chats</string>
@@ -29,7 +34,9 @@
     <string name="err_pass1">La contraseña debe tener al menos 6 caracteres</string>
     <string name="err_pass2">Las contraseñas no coinciden</string>
     <string name="cargando">Cargando datos...</string>
+
     <string-array name="categorias_array">
+        <item>Todas</item>
         <item>Naturaleza</item>
         <item>Montaña</item>
         <item>Aventura</item>
@@ -38,13 +45,10 @@
         <item>Religión</item>
     </string-array>
 
-    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
-    <string name="back4app_app_id">bQ9QKFlLd6JrAuQG4zwuway8Y3aL3iKvGkqqr7Nc</string>
-    <string name="back4app_client_key">B5BRGSSXlIfsLu8iIEtsL4QDAVfPPHVJCUGOgFlT</string>
-    <string name="fcm_sender_id">2867001442</string>
 
     <string-array name="orden_array">
         <item>Más recientes</item>
         <item>Más antiguos</item>
     </string-array>
+
 </resources>

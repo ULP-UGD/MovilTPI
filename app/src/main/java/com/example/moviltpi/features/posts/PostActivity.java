@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,14 +31,17 @@ import com.example.moviltpi.databinding.ActivityPostBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Actividad para crear y publicar un nuevo post.
  * Permite al usuario seleccionar imágenes, ingresar detalles del post y publicarlo.
+ * Después de publicar exitosamente, navega a HomeActivity.
  */
 public class PostActivity extends AppCompatActivity {
     private static final int MAX_IMAGES = 3;
     private static final int REQUEST_IMAGE = 1;
+    private static final String TAG = "PostActivity";
     private ActivityPostBinding binding;
 
     private PostViewModel postViewModel;
@@ -45,6 +50,7 @@ public class PostActivity extends AppCompatActivity {
     private String categoria;
 
     private ActivityResultLauncher<Intent> galleryLauncher;
+    private final AtomicBoolean isNavigating = new AtomicBoolean(false);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +79,14 @@ public class PostActivity extends AppCompatActivity {
      */
     private void setupViewModels() {
         postViewModel = new ViewModelProvider(this).get(PostViewModel.class);
-        postViewModel.getPostSuccess().observe(this, exito -> {
-            Toast.makeText(this, exito, Toast.LENGTH_SHORT).show();
-            finish();
+
+        // Observar mensajes de éxito del ViewModel
+        postViewModel.getPostSuccess().observe(this, mensaje -> {
+            Log.d(TAG, "Mensaje de éxito recibido: " + mensaje);
+            if (mensaje != null && mensaje.equals("Post publicado")) {
+                Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
+                navigateToHome();
+            }
         });
     }
 
@@ -111,7 +122,7 @@ public class PostActivity extends AppCompatActivity {
                     ImageUtils.subirImagenAParse(PostActivity.this, imageUri, new ImageUtils.ImageUploadCallback() {
                         @Override
                         public void onSuccess(String imageUrl) {
-                            Log.d("PostActivity", "Imagen subida con éxito: " + imageUrl);
+                            Log.d(TAG, "Imagen subida con éxito: " + imageUrl);
                             imagenesUrls.add(imageUrl);
                             adapter.notifyDataSetChanged();
                             updateRecyclerViewVisibility();
@@ -119,7 +130,7 @@ public class PostActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(Exception e) {
-                            Log.e("PostActivity", "Error al subir la imagen", e);
+                            Log.e(TAG, "Error al subir la imagen", e);
                             Toast.makeText(PostActivity.this, "Error al subir la imagen", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -133,6 +144,7 @@ public class PostActivity extends AppCompatActivity {
 
     /**
      * Valida y publica el post con los datos ingresados por el usuario.
+     * Si la publicación es exitosa, navega a HomeActivity.
      */
     private void publicarPost() {
         String titulo = binding.itTitulo.getText().toString().trim();
@@ -140,9 +152,17 @@ public class PostActivity extends AppCompatActivity {
         String duracionStr = binding.etDuracion.getText().toString().trim();
         String presupuestoStr = binding.etPresupuesto.getText().toString().trim();
 
-
+        // Validaciones
+        if (titulo.isEmpty()) {
+            binding.itTitulo.setError("El título es obligatorio");
+            return;
+        }
         if (!Validaciones.validarTexto(titulo)) {
             binding.itTitulo.setError("El título no es válido");
+            return;
+        }
+        if (descripcion.isEmpty()) {
+            binding.etDescripcion.setError("La descripción es obligatoria");
             return;
         }
         if (!Validaciones.validarTexto(descripcion)) {
@@ -150,17 +170,27 @@ public class PostActivity extends AppCompatActivity {
             return;
         }
         int duracion = Validaciones.validarNumero(duracionStr);
-        if (duracion == -1) {
+        if (duracionStr.isEmpty() || duracion == -1) {
             binding.etDuracion.setError("Duración no válida");
             return;
         }
         double presupuesto;
         try {
+            if (presupuestoStr.isEmpty()) {
+                binding.etPresupuesto.setError("El presupuesto es obligatorio");
+                return;
+            }
             presupuesto = Double.parseDouble(presupuestoStr);
         } catch (NumberFormatException e) {
             binding.etPresupuesto.setError("Presupuesto no válido");
             return;
         }
+        if (categoria == null) {
+            Toast.makeText(this, "Por favor, selecciona una categoría", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Crear el objeto Post
         Post post = new Post();
         post.setTitulo(titulo);
         post.setDescripcion(descripcion);
@@ -168,13 +198,37 @@ public class PostActivity extends AppCompatActivity {
         post.setCategoria(categoria);
         post.setPresupuesto(presupuesto);
         post.setImagenes(new ArrayList<>(imagenesUrls));
-        postViewModel.publicar(post).observe(this, result -> {
-            if (result != null) {
-                Toast.makeText(this, "Post publicado con éxito", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Error al publicar el post", Toast.LENGTH_SHORT).show();
+
+        // Mostrar un mensaje de carga
+        binding.btnPublicar.setEnabled(false);
+        binding.btnPublicar.setText("Publicando...");
+
+        // Publicar el post
+        postViewModel.publicar(post);
+
+        // Establecer un tiempo máximo de espera para la navegación
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (!isNavigating.get() && !isFinishing()) {
+                Log.d(TAG, "Tiempo de espera agotado, navegando a HomeActivity");
+                binding.btnPublicar.setEnabled(true);
+                binding.btnPublicar.setText("Publicar");
+                Toast.makeText(PostActivity.this, "Post publicado con éxito", Toast.LENGTH_SHORT).show();
+                navigateToHome();
             }
-        });
+        }, 5000); // 5 segundos de tiempo máximo de espera
+    }
+
+    /**
+     * Navega a la HomeActivity después de publicar un post exitosamente.
+     */
+    private void navigateToHome() {
+        if (isNavigating.compareAndSet(false, true)) {
+            Log.d(TAG, "Navegando a HomeActivity");
+            Intent intent = new Intent(PostActivity.this, HomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish(); // Cierra la actividad actual
+        }
     }
 
     /**
@@ -191,10 +245,10 @@ public class PostActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_IMAGE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Log.d("PostActivity", "Permiso concedido, abriendo galería");
+            Log.d(TAG, "Permiso concedido, abriendo galería");
             ImageUtils.openGallery(PostActivity.this, galleryLauncher);
         } else {
-            Log.d("PostActivity", "Permiso denegado");
+            Log.d(TAG, "Permiso denegado");
             Toast.makeText(this, "Permiso denegado", Toast.LENGTH_SHORT).show();
         }
     }

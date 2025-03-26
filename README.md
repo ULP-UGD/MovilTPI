@@ -140,3 +140,66 @@ MovilTPI/
 │   └── build.gradle.kts               # Configuración de Gradle
 └── README.md                          # Este archivo
 ```
+
+```mermaid
+flowchart TD
+    %% User Entry Point
+    U("User"):::external
+
+    %% Android App Architecture Breakdown
+    subgraph "Android App Architecture"
+        direction TB
+
+        %% UI Layer
+        subgraph "UI Layer"
+            UA["User Interface\n• MainActivity\n• HomeActivity\n• PostActivity\n• RegisterActivity\n• ChatFragment\n• HomeFragment\n• PerfilFragment"]:::ui
+        end
+
+        %% Presentation Layer
+        subgraph "Presentation Layer"
+            PL["ViewModels\n• AuthViewModel\n• MainViewModel\n• RegisterViewModel\n• ChatViewModel\n• PostViewModel\n• PostDetailViewModel"]:::viewModel
+        end
+
+        %% Domain Layer
+        subgraph "Domain Layer"
+            DL["Models\n• Post\n• Comentario\n• Mensaje\n• User"]:::model
+        end
+
+        %% Data Layer
+        subgraph "Data Layer"
+            DPL["Data Providers\n• AuthProvider\n• ChatProvider\n• PostProvider"]:::provider
+        end
+
+        %% Utilities & Services
+        subgraph "Utilities & Services"
+            US["Core Services\n• MyApplication\n• ImageUtils\n• EfectoTransformer\n• Validaciones\n• ImageAdapter\n• ImageSliderAdapter"]:::utility
+        end
+    end
+
+    %% External Services
+    subgraph "External Services"
+        ES["External APIs & Libraries\n• Parse Server\n• Third-Party Libraries\n  (Picasso, Glide,\n  Material Components)"]:::external
+    end
+
+    %% Relationships
+    U --> UA
+    UA --> PL
+    PL --> DL
+    PL --> DPL
+    DPL --> ES
+    US --> UA
+    US --> PL
+    US --> DPL
+
+    %% Styles
+    classDef ui fill:#cce5ff,stroke:#004085,stroke-width:2px,border-radius:5px;
+    classDef viewModel fill:#d4edda,stroke:#155724,stroke-width:2px,border-radius:5px;
+    classDef model fill:#fff3cd,stroke:#856404,stroke-width:2px,border-radius:5px;
+    classDef provider fill:#f8d7da,stroke:#721c24,stroke-width:2px,border-radius:5px;
+    classDef utility fill:#d1ecf1,stroke:#0c5460,stroke-width:2px,border-radius:5px;
+    classDef external fill:#ffefc1,stroke:#b8860b,stroke-width:2px,border-radius:5px;
+```
+
+>[!NOTE]
+>
+>Este diagrama es una modificacion del obtenido en https://gitdiagram.com/ulp-ugd/moviltpi

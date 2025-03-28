@@ -203,3 +203,70 @@ flowchart TD
 >[!NOTE]
 >
 >Este diagrama es una modificacion del obtenido en https://gitdiagram.com/ulp-ugd/moviltpi
+
+```mermaid
+graph TD
+    subgraph "Authentication & Authorization"
+        login[Login Activity]
+        register[Register Activity]
+        authProvider[AuthProvider]
+        authVM[AuthViewModel]
+        parseUser[ParseUser]
+        validation[Input Validation]
+    end
+
+    subgraph "Social Features"
+        post[Post Activity]
+        postDetail[Post Detail Activity]
+        postProvider[PostProvider]
+        postVM[PostViewModel]
+        chat[Chat Fragment]
+        chatProvider[ChatProvider]
+        chatVM[ChatViewModel]
+    end
+
+    subgraph "Data Layer"
+        parseDB[(Parse Database)]
+        liveQuery[Parse LiveQuery]
+        localCache[Local Cache]
+    end
+
+    subgraph "User Interface"
+        home[Home Activity]
+        profile[Profile Fragment]
+        fragments[UI Fragments]
+        adapters[Data Adapters]
+    end
+
+    %% Authentication Flow
+    login -->|Validate| validation
+    register -->|Validate| validation
+    validation -->|Process| authProvider
+    authProvider -->|Update| authVM
+    authProvider <-->|Authenticate| parseDB
+    authVM -->|Session State| home
+
+    %% Social Interaction Flow
+    home -->|Create Post| post
+    home -->|View Post| postDetail
+    post -->|Submit| postProvider
+    postDetail -->|Load| postProvider
+    postProvider -->|Update| postVM
+    postProvider <-->|Sync| parseDB
+    
+    %% Chat Flow
+    chat -->|Send Message| chatProvider
+    chatProvider -->|Update| chatVM
+    chatProvider <-->|Real-time| liveQuery
+    liveQuery <-->|Sync| parseDB
+
+    %% Data Management
+    parseDB -->|Cache| localCache
+    postVM -->|Display| adapters
+    chatVM -->|Display| adapters
+    adapters -->|Render| fragments
+
+    %% Profile Management
+    profile -->|Update| authProvider
+    profile -->|Load Posts| postProvider
+```

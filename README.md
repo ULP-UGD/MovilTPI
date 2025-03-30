@@ -140,3 +140,133 @@ MovilTPI/
 │   └── build.gradle.kts               # Configuración de Gradle
 └── README.md                          # Este archivo
 ```
+
+```mermaid
+flowchart TD
+    %% User Entry Point
+    U("User"):::external
+
+    %% Android App Architecture Breakdown
+    subgraph "Android App Architecture"
+        direction TB
+
+        %% UI Layer
+        subgraph "UI Layer"
+            UA["User Interface\n• MainActivity\n• HomeActivity\n• PostActivity\n• RegisterActivity\n• ChatFragment\n• HomeFragment\n• PerfilFragment"]:::ui
+        end
+
+        %% Presentation Layer
+        subgraph "Presentation Layer"
+            PL["ViewModels\n• AuthViewModel\n• MainViewModel\n• RegisterViewModel\n• ChatViewModel\n• PostViewModel\n• PostDetailViewModel"]:::viewModel
+        end
+
+        %% Domain Layer
+        subgraph "Domain Layer"
+            DL["Models\n• Post\n• Comentario\n• Mensaje\n• User"]:::model
+        end
+
+        %% Data Layer
+        subgraph "Data Layer"
+            DPL["Data Providers\n• AuthProvider\n• ChatProvider\n• PostProvider"]:::provider
+        end
+
+        %% Utilities & Services
+        subgraph "Utilities & Services"
+            US["Core Services\n• MyApplication\n• ImageUtils\n• EfectoTransformer\n• Validaciones\n• ImageAdapter\n• ImageSliderAdapter"]:::utility
+        end
+    end
+
+    %% External Services
+    subgraph "External Services"
+        ES["External APIs & Libraries\n• Parse Server\n• Third-Party Libraries\n  (Picasso, Glide,\n  Material Components)"]:::external
+    end
+
+    %% Relationships
+    U --> UA
+    UA --> PL
+    PL --> DL
+    PL --> DPL
+    DPL --> ES
+    US --> UA
+    US --> PL
+    US --> DPL
+
+    %% Styles
+    classDef ui fill:#cce5ff,stroke:#004085,stroke-width:2px,border-radius:5px;
+    classDef viewModel fill:#d4edda,stroke:#155724,stroke-width:2px,border-radius:5px;
+    classDef model fill:#fff3cd,stroke:#856404,stroke-width:2px,border-radius:5px;
+    classDef provider fill:#f8d7da,stroke:#721c24,stroke-width:2px,border-radius:5px;
+    classDef utility fill:#d1ecf1,stroke:#0c5460,stroke-width:2px,border-radius:5px;
+    classDef external fill:#ffefc1,stroke:#b8860b,stroke-width:2px,border-radius:5px;
+```
+
+>[!NOTE]
+>
+>Este diagrama es una modificacion del obtenido en https://gitdiagram.com/ulp-ugd/moviltpi
+
+```mermaid
+graph TD
+    subgraph "Authentication & Authorization"
+        login[Login Activity]
+        register[Register Activity]
+        authProvider[AuthProvider]
+        authVM[AuthViewModel]
+        parseUser[ParseUser]
+        validation[Input Validation]
+    end
+
+    subgraph "Social Features"
+        post[Post Activity]
+        postDetail[Post Detail Activity]
+        postProvider[PostProvider]
+        postVM[PostViewModel]
+        chat[Chat Fragment]
+        chatProvider[ChatProvider]
+        chatVM[ChatViewModel]
+    end
+
+    subgraph "Data Layer"
+        parseDB[(Parse Database)]
+        liveQuery[Parse LiveQuery]
+        localCache[Local Cache]
+    end
+
+    subgraph "User Interface"
+        home[Home Activity]
+        profile[Profile Fragment]
+        fragments[UI Fragments]
+        adapters[Data Adapters]
+    end
+
+    %% Authentication Flow
+    login -->|Validate| validation
+    register -->|Validate| validation
+    validation -->|Process| authProvider
+    authProvider -->|Update| authVM
+    authProvider <-->|Authenticate| parseDB
+    authVM -->|Session State| home
+
+    %% Social Interaction Flow
+    home -->|Create Post| post
+    home -->|View Post| postDetail
+    post -->|Submit| postProvider
+    postDetail -->|Load| postProvider
+    postProvider -->|Update| postVM
+    postProvider <-->|Sync| parseDB
+    
+    %% Chat Flow
+    chat -->|Send Message| chatProvider
+    chatProvider -->|Update| chatVM
+    chatProvider <-->|Real-time| liveQuery
+    liveQuery <-->|Sync| parseDB
+
+    %% Data Management
+    parseDB -->|Cache| localCache
+    postVM -->|Display| adapters
+    chatVM -->|Display| adapters
+    adapters -->|Render| fragments
+
+    %% Profile Management
+    profile -->|Update| authProvider
+    profile -->|Load Posts| postProvider
+```

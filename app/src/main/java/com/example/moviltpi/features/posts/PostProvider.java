@@ -17,12 +17,15 @@ import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Proveedor de datos para la gestión de posts en la aplicación.
  * Maneja operaciones CRUD y consultas relacionadas con posts utilizando Parse como backend.
  */
 public class PostProvider {
+
+    private static final String TAG = "PostProvider";
     private MutableLiveData<List<Post>> postsLiveData = new MutableLiveData<>();
 
     /**
@@ -47,6 +50,7 @@ public class PostProvider {
             if (e == null) {
                 guardarImagenes(post, result);
             } else {
+                Log.e(TAG, "Error al guardar el post", e);
                 result.setValue("Error al guardar el post: " + e.getMessage());
             }
         });
@@ -62,21 +66,45 @@ public class PostProvider {
      */
     private void guardarImagenes(Post post, MutableLiveData<String> result) {
         ParseRelation<ParseObject> relation = post.getRelation("images");
-        for (String url : post.getImagenes()) {
-            ParseObject imageObject = new ParseObject("Image");
-            imageObject.put("url", url);
-            imageObject.saveInBackground(imgSaveError -> {
-                if (imgSaveError == null) {
-                    relation.add(imageObject);
-                    post.saveInBackground(saveError -> {
-                        if (saveError == null) {
-                            result.setValue("Post publicado");
-                        } else {
-                            result.setValue("Error al guardar la relación con las imágenes: " + saveError.getMessage());
+        List<String> imageUrls = post.getImagenes();
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            int totalImages = imageUrls.size();
+            AtomicInteger uploadedImages = new AtomicInteger();
+            MutableLiveData<String> internalResult = new MutableLiveData<>();
+
+            for (String url : imageUrls) {
+                ParseObject imageObject = new ParseObject("Image");
+                imageObject.put("url", url);
+                imageObject.saveInBackground(imgSaveError -> {
+                    if (imgSaveError == null) {
+                        relation.add(imageObject);
+                        uploadedImages.getAndIncrement();
+                        if (uploadedImages.get() == totalImages) {
+                            post.saveInBackground(saveError -> {
+                                if (saveError == null) {
+                                    internalResult.setValue("Post publicado");
+                                } else {
+                                    Log.e(TAG, "Error al guardar la relación con las imágenes", saveError);
+                                    internalResult.setValue("Error al guardar la relación con las imágenes: " + saveError.getMessage());
+                                }
+                            });
                         }
-                    });
+                    } else {
+                        Log.e(TAG, "Error al guardar la imagen", imgSaveError);
+                        internalResult.setValue("Error al guardar la imagen: " + imgSaveError.getMessage());
+                    }
+                });
+            }
+            // Emitir el resultado final después de intentar guardar todas las imágenes
+            internalResult.observeForever(result::setValue);
+        } else {
+            // Si no hay imágenes, simplemente guardar el post
+            post.saveInBackground(saveError -> {
+                if (saveError == null) {
+                    result.setValue("Post publicado");
                 } else {
-                    result.setValue("Error al guardar la imagen: " + imgSaveError.getMessage());
+                    Log.e(TAG, "Error al guardar el post (sin imágenes)", saveError);
+                    result.setValue("Error al guardar el post: " + saveError.getMessage());
                 }
             });
         }
@@ -113,6 +141,7 @@ public class PostProvider {
         MutableLiveData<List<Post>> result = new MutableLiveData<>();
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include("user");
+        query.orderByDescending("createdAt"); // Añadir orden por defecto
         ejecutarConsulta(query, result);
 
         return result;
@@ -121,70 +150,58 @@ public class PostProvider {
     /**
      * Elimina un post específico y todos los comentarios asociados a él.
      *
-     * Este método realiza las siguientes acciones de forma asíncrona:
-     * 1. Busca el post con el ID proporcionado.
-     * 2. Si el post existe, busca todos los comentarios que están asociados a este post.
-     * 3. Elimina todos los comentarios encontrados.
-     * 4. Finalmente, elimina el post.
-     *
-     * El resultado de la operación se emite a través de un LiveData<String>, indicando el éxito
-     * de la eliminación o un mensaje de error en caso de fallo en cualquiera de los pasos.
-     *
      * @param postId ID del post a eliminar.
      * @return LiveData<String> que emite un mensaje indicando el resultado de la operación.
-     * Este mensaje puede ser:
-     * - "Post y comentarios asociados eliminados correctamente" si todo se eliminó con éxito.
-     * - "Post eliminado correctamente (sin comentarios asociados)" si el post se eliminó
-     * y no se encontraron comentarios asociados.
-     * - Un mensaje de error específico si falló la búsqueda del post, la búsqueda
-     * o eliminación de comentarios, o la eliminación del post.
      */
     public LiveData<String> deletePost(String postId) {
         MutableLiveData<String> result = new MutableLiveData<>();
 
         ParseQuery<Post> queryPost = ParseQuery.getQuery(Post.class);
         queryPost.getInBackground(postId, (post, e) -> {
-            if (e == null) {
-                // Primero, buscar y eliminar los comentarios asociados al post
-                ParseQuery<Comentario> queryComentarios = ParseQuery.getQuery(Comentario.class);
-                queryComentarios.whereEqualTo(Comentario.KEY_POST, post);
-                queryComentarios.findInBackground((comentarios, errorComentarios) -> {
-                    if (errorComentarios == null) {
-                        if (comentarios != null && !comentarios.isEmpty()) {
-                            // Eliminar todos los comentarios encontrados
-                            ParseObject.deleteAllInBackground(comentarios, eDeleteComments -> {
-                                if (eDeleteComments == null) {
-                                    // Después de eliminar los comentarios, eliminar el post
-                                    post.deleteInBackground(eDeletePost -> {
-                                        if (eDeletePost == null) {
-                                            result.setValue("Post y comentarios asociados eliminados correctamente");
-                                        } else {
-                                            result.setValue("Error al eliminar el post: " + eDeletePost.getMessage());
-                                        }
-                                    });
-                                } else {
-                                    result.setValue("Error al eliminar los comentarios: " + eDeleteComments.getMessage());
-                                }
-                            });
-                        } else {
-                            // No hay comentarios asociados al post, eliminar solo el post
-                            post.deleteInBackground(eDeletePost -> {
-                                if (eDeletePost == null) {
-                                    result.setValue("Post eliminado correctamente (sin comentarios asociados)");
-                                } else {
-                                    result.setValue("Error al eliminar el post: " + eDeletePost.getMessage());
-                                }
-                            });
-                        }
-                    } else {
-                        result.setValue("Error al buscar los comentarios del post: " + errorComentarios.getMessage());
-                    }
-                });
+            if (e == null && post != null) {
+                eliminarComentariosAsociados(post, result);
             } else {
-                result.setValue("Error al encontrar el post: " + e.getMessage());
+                String errorMessage = (e != null) ? e.getMessage() : "Post no encontrado";
+                Log.e(TAG, "Error al encontrar el post", e);
+                result.setValue("Error al encontrar el post: " + errorMessage);
             }
         });
         return result;
+    }
+
+    private void eliminarComentariosAsociados(Post post, MutableLiveData<String> result) {
+        ParseQuery<Comentario> queryComentarios = ParseQuery.getQuery(Comentario.class);
+        queryComentarios.whereEqualTo(Comentario.KEY_POST, post);
+        queryComentarios.findInBackground((comentarios, errorComentarios) -> {
+            if (errorComentarios == null) {
+                if (comentarios != null && !comentarios.isEmpty()) {
+                    ParseObject.deleteAllInBackground(comentarios, eDeleteComments -> {
+                        if (eDeleteComments == null) {
+                            eliminarPost(post, result, true);
+                        } else {
+                            Log.e(TAG, "Error al eliminar los comentarios", eDeleteComments);
+                            result.setValue("Error al eliminar los comentarios: " + eDeleteComments.getMessage());
+                        }
+                    });
+                } else {
+                    eliminarPost(post, result, false);
+                }
+            } else {
+                Log.e(TAG, "Error al buscar los comentarios del post", errorComentarios);
+                result.setValue("Error al buscar los comentarios del post: " + errorComentarios.getMessage());
+            }
+        });
+    }
+
+    private void eliminarPost(Post post, MutableLiveData<String> result, boolean commentsDeleted) {
+        post.deleteInBackground(eDeletePost -> {
+            if (eDeletePost == null) {
+                result.setValue(commentsDeleted ? "Post y comentarios asociados eliminados correctamente" : "Post eliminado correctamente (sin comentarios asociados)");
+            } else {
+                Log.e(TAG, "Error al eliminar el post", eDeletePost);
+                result.setValue("Error al eliminar el post: " + eDeletePost.getMessage());
+            }
+        });
     }
 
     /**
@@ -199,11 +216,11 @@ public class PostProvider {
         query.include("user");
         query.include("images");
         query.getInBackground(postId, (post, e) -> {
-            if (e == null) {
+            if (e == null && post != null) {
                 cargarImagenesYUsuario(post, result);
             } else {
+                Log.e(TAG, "Error al obtener el post", e);
                 result.setValue(null);
-                Log.e("PostProvider", "Error al obtener el post: ", e);
             }
         });
 
@@ -218,15 +235,15 @@ public class PostProvider {
      */
     private void cargarImagenesYUsuario(Post post, MutableLiveData<Post> result) {
         ParseRelation<ParseObject> relation = post.getRelation("images");
+        List<String> imageUrls = new ArrayList<>();
         try {
             List<ParseObject> images = relation.getQuery().find();
-            List<String> imageUrls = new ArrayList<>();
             for (ParseObject imageObject : images) {
                 imageUrls.add(imageObject.getString("url"));
             }
             post.setImagenes(imageUrls);
         } catch (ParseException parseException) {
-            parseException.printStackTrace();
+            Log.e(TAG, "Error al cargar las imágenes del post", parseException);
         }
 
         ParseObject userObject = post.getParseObject("user");
@@ -239,20 +256,21 @@ public class PostProvider {
                 user.setFotoperfil(userObject.getString("foto_perfil"));
                 post.setUser(user);
             } catch (ParseException userFetchException) {
-                userFetchException.printStackTrace();
+                Log.e(TAG, "Error al cargar la información del usuario del post", userFetchException);
             }
         }
         result.setValue(post);
     }
 
-    // Getters y setters para postsLiveData
-    public MutableLiveData<List<Post>> getPostsLiveData() {
+    // Getters y setters para postsLiveData (considerar si realmente se necesitan setters públicos)
+    public LiveData<List<Post>> getPostsLiveData() {
         return postsLiveData;
     }
 
-    public void setPostsLiveData(MutableLiveData<List<Post>> postsLiveData) {
-        this.postsLiveData = postsLiveData;
-    }
+    // Si se necesita modificar la lista desde fuera, considerar la lógica y seguridad
+    // public void setPostsLiveData(MutableLiveData<List<Post>> postsLiveData) {
+    //     this.postsLiveData = postsLiveData;
+    // }
 
     /**
      * Interfaz para manejar callbacks de operaciones con comentarios.
@@ -273,10 +291,12 @@ public class PostProvider {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Comentario");
         query.whereEqualTo("post", ParseObject.createWithoutData("Post", postId));
         query.include("user");
+        query.orderByDescending("createdAt"); // Ordenar comentarios por fecha de creación
         query.findInBackground((comentarios, e) -> {
             if (e == null) {
                 callback.onSuccess(comentarios);
             } else {
+                Log.e(TAG, "Error al obtener los comentarios del post", e);
                 callback.onFailure(e);
             }
         });
@@ -292,7 +312,7 @@ public class PostProvider {
      */
     public void saveComment(String postId, String commentText, ParseUser currentUser, SaveCallback callback) {
         ParseObject post = ParseObject.createWithoutData("Post", postId);
-        ParseObject comentario = ParseObject.create("Comentario");
+        ParseObject comentario = new ParseObject("Comentario");
         comentario.put("texto", commentText);
         comentario.put("post", post);
         comentario.put("user", currentUser);
@@ -327,15 +347,7 @@ public class PostProvider {
         }
 
         query.include("user");
-        query.findInBackground((posts, e) -> {
-            if (e == null) {
-                Log.d("PostProvider", "Posts filtrados encontrados: " + (posts != null ? posts.size() : 0));
-                result.setValue(posts != null ? posts : new ArrayList<>());
-            } else {
-                Log.e("PostProvider", "Error al recuperar posts filtrados: ", e);
-                result.setValue(new ArrayList<>());
-            }
-        });
+        ejecutarConsulta(query, result);
 
         return result;
     }
@@ -351,8 +363,8 @@ public class PostProvider {
             if (e == null) {
                 result.setValue(posts);
             } else {
+                Log.e(TAG, "Error al recuperar posts", e);
                 result.setValue(new ArrayList<>());
-                Log.e("PostProvider", "Error al recuperar posts: ", e);
             }
         });
     }

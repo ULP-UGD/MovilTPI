@@ -1,6 +1,9 @@
 package com.example.moviltpi.features.posts;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -21,6 +24,7 @@ import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Actividad que muestra los detalles de una publicación (post).
@@ -31,6 +35,8 @@ public class PostDetailActivity extends AppCompatActivity {
     private PostDetailViewModel postDetailViewModel;
     private ComentarioAdapter comentarioAdapter;
     private String postId;
+    private final AtomicBoolean isNavigating = new AtomicBoolean(false);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,10 +86,32 @@ public class PostDetailActivity extends AppCompatActivity {
         alert.setTitle("Confirmación");
         alert.setMessage("¿Estás seguro de que deseas eliminar este post?");
 
-        alert.setPositiveButton("Eliminar", (dialog, which) -> postDetailViewModel.eliminarPost(postId));
+        alert.setPositiveButton("Eliminar", (dialog, which) -> {
+            // Cambiar el texto del botón y deshabilitarlo mientras se elimina
+            binding.btnEliminarPost.setText("Eliminando...");
+            binding.btnEliminarPost.setEnabled(false);
+
+            postDetailViewModel.eliminarPost(postId);
+
+            // Observe the success LiveData for deletion result
+            postDetailViewModel.getSuccessLiveData().observe(this, message -> {
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            });
+
+            // Establecer un tiempo máximo de espera para la navegación (por si acaso)
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (!isNavigating.get() && !isFinishing()) {
+                    binding.btnEliminarPost.setText("Eliminar");
+                    binding.btnEliminarPost.setEnabled(true);
+                }
+                Intent intent = new Intent(this, HomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }, 5000); // 5 segundos de tiempo máximo de espera
+        });
 
         alert.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
-
         alert.show();
     }
 
@@ -136,11 +164,12 @@ public class PostDetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "Error: " + error, Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
-        postDetailViewModel.getSuccessLiveData().observe(this, message -> {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-            finish(); // Cierra la actividad tras eliminar el post
-        });
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isNavigating.set(false); // Restablecer la variable al detener la actividad
     }
 
     /**

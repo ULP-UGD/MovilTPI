@@ -35,8 +35,17 @@
     <string name="err_pass2">Las contraseñas no coinciden</string>
     <string name="cargando">Cargando datos...</string>
 
-    <string-array name="categorias_array">
+    <string-array name="categorias_filtros_array">
         <item>Todas</item>
+        <item>Naturaleza</item>
+        <item>Montaña</item>
+        <item>Aventura</item>
+        <item>Cultura</item>
+        <item>Playa</item>
+        <item>Religión</item>
+    </string-array>
+
+    <string-array name="categorias_array">
         <item>Naturaleza</item>
         <item>Montaña</item>
         <item>Aventura</item>

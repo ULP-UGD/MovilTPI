@@ -66,7 +66,7 @@ public class FiltrosFragment extends Fragment {
         // Configura el Spinner de categorías con las opciones del array de recursos
         ArrayAdapter<CharSequence> categoriaAdapter = ArrayAdapter.createFromResource(
                 requireContext(),
-                R.array.categorias_array,
+                R.array.categorias_filtros_array,
                 android.R.layout.simple_spinner_item
         );
         categoriaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

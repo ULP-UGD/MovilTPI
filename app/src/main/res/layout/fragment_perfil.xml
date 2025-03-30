@@ -97,6 +97,15 @@
                             android:textSize="13sp"
                             android:textStyle="bold"
                             tools:ignore="TextSizeCheck" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" PUBLICACIONES"
+                            android:textColor="@color/on_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            tools:ignore="TextSizeCheck" />
+
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

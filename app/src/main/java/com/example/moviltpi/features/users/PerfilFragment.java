@@ -76,14 +76,30 @@ public class PerfilFragment extends Fragment {
                 Log.d("PerfilFragment", "Número de posts: " + posts.size());
                 PostAdapter adapter = new PostAdapter(posts);
                 binding.recyclerView.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-                ((HomeActivity) requireActivity()).hideProgressBar();
+
+                // Actualizar contador de publicaciones
+                if (binding.cantPost != null) {
+                    binding.cantPost.setText(String.valueOf(posts.size()));
+                }
+
+                if (getActivity() instanceof HomeActivity) {
+                    ((HomeActivity) requireActivity()).hideProgressBar();
+                }
             } else {
                 Log.d("PerfilFragment", "No hay posts disponibles.");
-                ((HomeActivity) requireActivity()).hideProgressBar();
+
+                // Actualizar contador de publicaciones a cero
+                if (binding.cantPost != null) {
+                    binding.cantPost.setText("0");
+                }
+
+                if (getActivity() instanceof HomeActivity) {
+                    ((HomeActivity) requireActivity()).hideProgressBar();
+                }
             }
         });
     }
+
 
     /**
      * Configura el menú con la opción de cerrar sesión.

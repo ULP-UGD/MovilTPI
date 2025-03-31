@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moviltpi.R;
+import com.example.moviltpi.core.models.Comentario;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -52,8 +53,8 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ParseObject comentario = comentarios.get(position);
-        holder.bind(comentario);
+        ParseObject comentarioParse = comentarios.get(position);
+        holder.bind(comentarioParse);
     }
 
     @Override
@@ -82,11 +83,11 @@ public class ComentarioAdapter extends RecyclerView.Adapter<ComentarioAdapter.Vi
         /**
          * Vincula los datos del comentario a la vista del elemento.
          *
-         * @param comentario El objeto ParseObject que contiene los datos del comentario.
+         * @param comentarioParse El objeto ParseObject que contiene los datos del comentario.
          */
-        public void bind(ParseObject comentario) {
-            txtComentario.setText(comentario.getString("texto"));
-            ParseUser usuario = comentario.getParseUser("user");
+        public void bind(ParseObject comentarioParse) {
+            txtComentario.setText(comentarioParse.getString(Comentario.KEY_TEXTO));
+            ParseUser usuario = comentarioParse.getParseUser(Comentario.KEY_USER);
             if (usuario != null) {
                 txtUsuario.setText(usuario.getUsername());
             }
